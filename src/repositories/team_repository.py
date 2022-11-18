@@ -1,4 +1,4 @@
-from typing import Dict, List, Union
+from typing import List, Optional
 from db.database import SessionLocal
 from db import models
 import logging
@@ -21,7 +21,7 @@ class TeamRepository:
         self.db.refresh(new_team)
         return new_team
 
-    def delete_team(self, id: int):
+    def delete_team(self, id: int) -> int:
         team = self.db.query(models.Team).filter(
             models.Team.id == id).delete(synchronize_session=False)
         self.db.commit()
@@ -30,17 +30,17 @@ class TeamRepository:
             raise NoTeamException()
         return team
 
-    def get_teams(self, skip: int, limit: Union[int, None] = None) -> List[models.Team]:
+    def get_teams(self, skip: int, limit: Optional[int] = None) -> List[models.Team]:
         teams = self.db.query(models.Team).offset(skip).limit(limit)
         return teams
 
-    def get_team(self, id: int):
+    def get_team(self, id: int) -> models.Team:
         team = self.db.query(models.Team).filter(models.Team.id == id).first()
         if not team:
             raise NoTeamException()
         return team
 
-    def update_team(self, id: int, name: str, country: str, cur_pos_league: str):
+    def update_team(self, id: int, name: str, country: str, cur_pos_league: str) -> models.Team:
         team = self.db.query(models.Team)\
             .filter(models.Team.id == id)\
             .update({models.Team.name: name if name else models.Team.name,
